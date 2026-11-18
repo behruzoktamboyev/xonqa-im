@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Sun, Moon, GraduationCap, ArrowUpRight, Globe, ChevronDown, Menu, X } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
+import VisitCounter from '@/components/VisitCounter';
 
 const LANGUAGES = [
   { code: 'EN', name: 'English', flag: '🇬🇧' },
@@ -134,8 +135,11 @@ export default function PublicHeader() {
         </a>
       </nav>
 
-      {/* Right Controls: Language Switcher, Theme Toggle & Apply Button Group */}
+      {/* Right Controls: Visit Counter, Language Switcher, Theme Toggle & Apply Button Group */}
       <div className="flex items-center gap-1.5 sm:gap-2.5">
+
+        {/* LIVE VISIT COUNTER BADGE */}
+        <VisitCounter variant="compact" />
 
         {/* LANGUAGE SWITCHER BUTTON */}
         <div className="relative" ref={dropdownRef}>

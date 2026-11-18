@@ -11,6 +11,10 @@ export const TRANSLATIONS = {
       specializedSchool: 'SPECIALIZED SCHOOL',
       xonqaRegion: 'Xonqa Region',
     },
+    visitCounter: {
+      label: 'TOTAL VISITS',
+      suffix: 'Visits',
+    },
     hero: {
       agencyBadge: 'Agency for Specialized Educational Institutions of the Republic of Uzbekistan',
       headingTitle: 'Khanka Specialized School:',
@@ -265,6 +269,10 @@ export const TRANSLATIONS = {
       specializedSchool: 'IXTISOSLASHTIRILGAN MAKTAB',
       xonqaRegion: 'Xonqa Tumani',
     },
+    visitCounter: {
+      label: 'JAMI TASHRIFLAR',
+      suffix: 'Tashrif',
+    },
     hero: {
       agencyBadge: "O'zbekiston Respublikasi Ixtisoslashtirilgan Ta'lim Muassasalari Agentligi",
       headingTitle: 'Xonqa Ixtisoslashtirilgan Maktabi:',
@@ -307,9 +315,9 @@ export const TRANSLATIONS = {
       experience: 'yil tajriba',
       roles: {
         director: 'Maktab Direktori',
-        deputyAcademic: "O'quv ishlari bo'yicha o'rinbosar",
-        deputyStudent: "Ma'naviy-ma'rifiy ishlar bo'yicha o'rinbosar",
-        counsellor: 'Maktab Psixologi / Maslahatchi',
+        deputyAcademic: "O'quv Ishlari O'rinbosari",
+        deputyStudent: "Ma'naviy-Ma'rifiy O'rinbosar",
+        counsellor: 'Maktab Psixologi',
       },
     },
     achievements: {
@@ -519,6 +527,10 @@ export const TRANSLATIONS = {
       specializedSchool: 'СПЕЦИАЛИЗИРОВАННАЯ ШКОЛА',
       xonqaRegion: 'Ханкинский Район',
     },
+    visitCounter: {
+      label: 'ВСЕГО ПРОСМОТРОВ',
+      suffix: 'Просмотров',
+    },
     hero: {
       agencyBadge: 'Агентство специализированных образовательных учреждений Республики Узбекистан',
       headingTitle: 'Специализированная Школа Ханка:',
@@ -561,9 +573,9 @@ export const TRANSLATIONS = {
       experience: 'лет опыта',
       roles: {
         director: 'Директор Школы',
-        deputyAcademic: 'Зам. директора по учебной работе',
-        deputyStudent: 'Зам. директора по воспитательной работе',
-        counsellor: 'Школьный Психолог / Консультант',
+        deputyAcademic: 'Зам. директора по учебе',
+        deputyStudent: 'Зам. директора по воспитанию',
+        counsellor: 'Школьный Психолог',
       },
     },
     achievements: {
@@ -741,7 +753,7 @@ export const TRANSLATIONS = {
       infoTitle: 'Контактная Информация',
       infoSubtitle: 'Вы можете связаться с нами напрямую по любым указанным каналам.',
       address: 'Адрес',
-      addressVal: 'Узбекистан, Хорезмская область, Ханкинский район, улица Мустакиллик 59-а',
+      addressVal: 'Узбекистан, Хорезмская область, Ханкинский район, улица Мустакиллик 59-a',
       phone: 'Телефон',
       email: 'Эл. почта',
       officeHours: 'Часы Работы',

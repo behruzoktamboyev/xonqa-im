@@ -8,6 +8,7 @@ import {
   ExternalLink,
 } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
+import VisitCounter from '@/components/VisitCounter';
 
 // Import built page components directly from their file locations
 import AchievementsPage from '@/app/achievements/page';
@@ -154,13 +155,16 @@ export default function Home() {
               {t('hero', 'subtitle')}
             </p>
 
-            <div>
+            <div className="flex flex-wrap items-center gap-4">
               <a
                 href="#clubs"
                 className="inline-flex items-center gap-2 bg-emerald-500 hover:bg-emerald-400 text-black px-6 py-3.5 rounded-full text-xs font-bold transition-all shadow-lg"
               >
                 {t('hero', 'exploreClubs')} <ArrowRight className="w-4 h-4" />
               </a>
+
+              {/* PROMINENT VISIT COUNTER BADGE */}
+              <VisitCounter />
             </div>
           </div>
         </div>

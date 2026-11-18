@@ -93,9 +93,9 @@ export default function TeachersPage() {
               {/* Content Details */}
               <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
                 <div className="space-y-2">
-                  <div className="flex items-center gap-1.5 text-[10px] text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-lg border border-emerald-500/20 font-mono font-semibold truncate w-fit">
-                    <BookOpen className="w-3 h-3 shrink-0" />
-                    <span className="truncate">{displayRole}</span>
+                  <div className="inline-flex items-center gap-1.5 text-[10px] text-emerald-400 bg-emerald-500/10 px-2.5 py-1.5 rounded-lg border border-emerald-500/20 font-mono font-semibold max-w-full leading-snug whitespace-normal break-words">
+                    <BookOpen className="w-3.5 h-3.5 shrink-0" />
+                    <span>{displayRole}</span>
                   </div>
 
                   <h3 className="text-lg font-bold font-serif theme-text-primary group-hover:text-emerald-400 transition-colors">
