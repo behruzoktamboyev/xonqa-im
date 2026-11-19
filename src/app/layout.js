@@ -2,6 +2,7 @@ import './globals.css';
 import PublicHeader from '@/components/PublicHeader';
 import Footer from '@/components/Footer';
 import { LanguageProvider } from '@/context/LanguageContext';
+import { VisitProvider } from '@/context/VisitContext';
 
 export const metadata = {
   title: "Xonqa tuman Ixtisoslashtirilgan Maktabi",
@@ -21,9 +22,11 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <body className="antialiased selection:bg-emerald-500 selection:text-black">
         <LanguageProvider>
-          <PublicHeader />
-          <main>{children}</main>
-          <Footer />
+          <VisitProvider>
+            <PublicHeader />
+            <main>{children}</main>
+            <Footer />
+          </VisitProvider>
         </LanguageProvider>
       </body>
     </html>

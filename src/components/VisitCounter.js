@@ -1,50 +1,12 @@
 'use client';
 
-import { useState, useEffect } from 'react';
 import { Eye, Users } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
+import { useVisitCount } from '@/context/VisitContext';
 
 export default function VisitCounter({ variant = 'default' }) {
   const { t } = useLanguage();
-  const [views, setViews] = useState(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    let isMounted = true;
-
-    async function handleViewCounter() {
-      try {
-        const hasVisitedSession = typeof window !== 'undefined' && sessionStorage.getItem('visited_session');
-
-        let res;
-        if (hasVisitedSession) {
-          // Already counted this session -> GET current count without incrementing again
-          res = await fetch('/api/views', { method: 'GET' });
-        } else {
-          // New session -> POST to increment count once, then mark session
-          if (typeof window !== 'undefined') {
-            sessionStorage.setItem('visited_session', 'true');
-          }
-          res = await fetch('/api/views', { method: 'POST' });
-        }
-
-        const data = await res.json();
-        if (isMounted && data.count !== undefined) {
-          setViews(data.count);
-        }
-      } catch (err) {
-        console.error('Failed to update visit counter:', err);
-      } finally {
-        if (isMounted) setLoading(false);
-      }
-    }
-
-    handleViewCounter();
-
-    return () => {
-      isMounted = false;
-    };
-  }, []);
+  const { views, loading } = useVisitCount();
 
   const formattedViews = views !== null ? views.toLocaleString() : '...';
   const labelText = t('visitCounter', 'label');
