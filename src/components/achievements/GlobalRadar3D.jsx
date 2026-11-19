@@ -15,7 +15,9 @@ import {
   CheckCircle2,
   BookmarkCheck,
   User,
-  Radar,
+  Plus,
+  Minus,
+  RefreshCw,
 } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
 
@@ -23,16 +25,38 @@ import { useLanguage } from '@/context/LanguageContext';
 const Globe = dynamic(() => import('react-globe.gl'), { ssr: false });
 
 function projectTo2D(lat, lng) {
-  const x = 200 + (lng / 180) * 160;
-  const y = 140 - (lat / 90) * 110;
+  const x = 400 + (lng / 180) * 360;
+  const y = 210 - (lat / 90) * 180;
   return { x, y };
 }
 
 function getSvgArc(p1, p2) {
   const dx = p2.x - p1.x;
   const cx = (p1.x + p2.x) / 2;
-  const cy = (p1.y + p2.y) / 2 - Math.abs(dx) * 0.25 - 15;
+  const cy = (p1.y + p2.y) / 2 - Math.abs(dx) * 0.25 - 20;
   return `M ${p1.x} ${p1.y} Q ${cx} ${cy} ${p2.x} ${p2.y}`;
+}
+
+function geoToSvgPath(geometry) {
+  if (!geometry) return '';
+  const project = ([lng, lat]) => {
+    const x = (400 + (lng / 180) * 360).toFixed(1);
+    const y = (210 - (lat / 90) * 180).toFixed(1);
+    return `${x},${y}`;
+  };
+
+  if (geometry.type === 'Polygon') {
+    return geometry.coordinates
+      .map((ring) => 'M' + ring.map(project).join('L') + 'Z')
+      .join(' ');
+  } else if (geometry.type === 'MultiPolygon') {
+    return geometry.coordinates
+      .map((polygon) =>
+        polygon.map((ring) => 'M' + ring.map(project).join('L') + 'Z').join(' ')
+      )
+      .join(' ');
+  }
+  return '';
 }
 
 export default function GlobalRadar3D() {
@@ -45,6 +69,12 @@ export default function GlobalRadar3D() {
   const [isVisible, setIsVisible] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [globeDimensions, setGlobeDimensions] = useState({ width: 650, height: 520 });
+
+  // 2D World Map Pan & Zoom state
+  const [zoom, setZoom] = useState(1);
+  const [pan, setPan] = useState({ x: 0, y: 0 });
+  const [isDragging, setIsDragging] = useState(false);
+  const touchStartRef = useRef({ x: 0, y: 0 });
 
   // Custom Sky Blue Globe Material for Oceans
   const customGlobeMaterial = useMemo(() => {
@@ -143,6 +173,36 @@ export default function GlobalRadar3D() {
     }
   };
 
+  // Zoom Control Handlers
+  const handleZoomIn = () => setZoom((prev) => Math.min(prev + 0.5, 4));
+  const handleZoomOut = () => setZoom((prev) => Math.max(prev - 0.5, 1));
+  const handleResetZoom = () => {
+    setZoom(1);
+    setPan({ x: 0, y: 0 });
+  };
+
+  // Touch Pan Handlers (only active when zoomed in > 1x)
+  const handleTouchStart = (e) => {
+    if (zoom > 1 && e.touches.length === 1) {
+      setIsDragging(true);
+      touchStartRef.current = {
+        x: e.touches[0].clientX - pan.x,
+        y: e.touches[0].clientY - pan.y,
+      };
+    }
+  };
+
+  const handleTouchMove = (e) => {
+    if (isDragging && zoom > 1 && e.touches.length === 1) {
+      setPan({
+        x: e.touches[0].clientX - touchStartRef.current.x,
+        y: e.touches[0].clientY - touchStartRef.current.y,
+      });
+    }
+  };
+
+  const handleTouchEnd = () => setIsDragging(false);
+
   const singleArcData = activeStudent
     ? [
         {
@@ -173,8 +233,8 @@ export default function GlobalRadar3D() {
         color: isSelected
           ? '#3b82f6'
           : isEnrolled
-          ? '#10b981'
-          : '#f59e0b',
+          ? '#eab308'
+          : '#f97316',
         studentIndex: idx,
       };
     }),
@@ -236,95 +296,154 @@ export default function GlobalRadar3D() {
       {/* Main Split View */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch w-full max-w-full">
         
-        {/* LEFT SIDE: Interactive Radar View (3D on Desktop >=768px, Interactive 2D SVG Radar on Mobile <768px) */}
+        {/* LEFT SIDE: Interactive Radar View (3D WebGL Globe on Desktop >=768px, Interactive 2D Vector World Map on Mobile <768px) */}
         <div className="lg:col-span-7 relative w-full h-[340px] sm:h-[420px] lg:h-[520px] rounded-3xl bg-[#0a0f18] border border-white/10 overflow-hidden flex items-center justify-center shadow-lg">
 
-          {/* MOBILE INTERACTIVE 2D SVG RADAR (< 768px) */}
+          {/* MOBILE INTERACTIVE 2D VECTOR WORLD MAP (< 768px) */}
           {isMobile ? (
-            <div className="relative w-full h-full p-4 flex flex-col items-center justify-center">
-              <svg viewBox="0 0 400 280" className="w-full h-full max-h-[300px]">
-                <defs>
-                  <linearGradient id="radarSweep" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stopColor="#10b981" stopOpacity="0.4" />
-                    <stop offset="100%" stopColor="#10b981" stopOpacity="0" />
-                  </linearGradient>
-                </defs>
+            <div
+              className="relative w-full h-full overflow-hidden flex items-center justify-center select-none"
+              onTouchStart={handleTouchStart}
+              onTouchMove={handleTouchMove}
+              onTouchEnd={handleTouchEnd}
+            >
+              {/* Floating Map Controls (Top Right) */}
+              <div className="absolute top-3 right-3 z-30 flex flex-col gap-1 bg-zinc-950/90 p-1 rounded-xl border border-white/10 shadow-lg">
+                <button
+                  onClick={handleZoomIn}
+                  aria-label="Zoom In"
+                  className="p-1.5 rounded-lg hover:bg-white/10 text-white/90 transition-colors cursor-pointer"
+                >
+                  <Plus className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={handleZoomOut}
+                  aria-label="Zoom Out"
+                  className="p-1.5 rounded-lg hover:bg-white/10 text-white/90 transition-colors cursor-pointer"
+                >
+                  <Minus className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={handleResetZoom}
+                  aria-label="Reset Map"
+                  className="p-1.5 rounded-lg hover:bg-white/10 text-sky-400 transition-colors cursor-pointer"
+                >
+                  <RefreshCw className="w-3.5 h-3.5" />
+                </button>
+              </div>
 
-                {/* Radar Concentric Circles */}
-                <circle cx="200" cy="140" r="40" fill="none" stroke="#1e293b" strokeWidth="1" strokeDasharray="4 4" />
-                <circle cx="200" cy="140" r="80" fill="none" stroke="#1e293b" strokeWidth="1" strokeDasharray="4 4" />
-                <circle cx="200" cy="140" r="120" fill="none" stroke="#334155" strokeWidth="1" />
-                <circle cx="200" cy="140" r="160" fill="none" stroke="#1e293b" strokeWidth="1" strokeDasharray="4 4" />
+              {/* 2D SVG World Map Container */}
+              <div
+                className="w-full h-full flex items-center justify-center transition-transform duration-150 ease-out will-change-transform"
+                style={{
+                  transform: `translate3d(${pan.x}px, ${pan.y}px, 0) scale(${zoom})`,
+                  transformOrigin: 'center center',
+                }}
+              >
+                <svg viewBox="0 0 800 420" className="w-full h-full">
+                  {/* Lat/Lng Grid Lines */}
+                  <line x1="0" y1="105" x2="800" y2="105" stroke="#1e293b" strokeWidth="0.5" strokeDasharray="4 4" />
+                  <line x1="0" y1="210" x2="800" y2="210" stroke="#1e293b" strokeWidth="0.8" strokeDasharray="4 4" />
+                  <line x1="0" y1="315" x2="800" y2="315" stroke="#1e293b" strokeWidth="0.5" strokeDasharray="4 4" />
 
-                {/* Lat/Lng Axis Crosshairs */}
-                <line x1="20" y1="140" x2="380" y2="140" stroke="#334155" strokeWidth="1" strokeDasharray="2 4" />
-                <line x1="200" y1="20" x2="200" y2="260" stroke="#334155" strokeWidth="1" strokeDasharray="2 4" />
+                  <line x1="200" y1="0" x2="200" y2="420" stroke="#1e293b" strokeWidth="0.5" strokeDasharray="4 4" />
+                  <line x1="400" y1="0" x2="400" y2="420" stroke="#1e293b" strokeWidth="0.8" strokeDasharray="4 4" />
+                  <line x1="600" y1="0" x2="600" y2="420" stroke="#1e293b" strokeWidth="0.5" strokeDasharray="4 4" />
 
-                {/* Rotating Sweep Line */}
-                <line x1="200" y1="140" x2="360" y2="80" stroke="#10b981" strokeWidth="1.5" opacity="0.6">
-                  <animateTransform
-                    attributeName="transform"
-                    type="rotate"
-                    from="0 200 140"
-                    to="360 200 140"
-                    dur="6s"
-                    repeatCount="indefinite"
-                  />
-                </line>
-
-                {/* Trajectory Arc to Selected University */}
-                {activeStudent && (() => {
-                  const destP = projectTo2D(activeStudent.lat, activeStudent.lng);
-                  const arcPath = getSvgArc(originP, destP);
-                  const arcColor = activeStudent.status === 'enrolled' ? '#10b981' : '#f59e0b';
-                  return (
-                    <g>
+                  {/* Real World Country Polygons */}
+                  {countries.features.map((country, idx) => {
+                    const pathData = geoToSvgPath(country.geometry);
+                    return (
                       <path
-                        d={arcPath}
-                        fill="none"
-                        stroke={arcColor}
-                        strokeWidth="2"
-                        strokeDasharray="5 3"
-                        className="animate-pulse"
+                        key={idx}
+                        d={pathData}
+                        fill="#162032"
+                        stroke="#2a3954"
+                        strokeWidth="0.5"
+                        className="transition-colors hover:fill-slate-700"
                       />
-                    </g>
-                  );
-                })()}
+                    );
+                  })}
 
-                {/* Origin Base Pin (Xorazm) */}
-                <g>
-                  <circle cx={originP.x} cy={originP.y} r="8" fill="#10b981" opacity="0.2" className="animate-ping" />
-                  <circle cx={originP.x} cy={originP.y} r="5" fill="#059669" stroke="#ffffff" strokeWidth="1.5" />
-                  <text x={originP.x + 8} y={originP.y - 6} fill="#10b981" fontSize="9" fontFamily="monospace" fontWeight="bold">
-                    Xonqa IM Base
-                  </text>
-                </g>
+                  {/* Trajectory Arc to Selected University */}
+                  {activeStudent && (() => {
+                    const destP = projectTo2D(activeStudent.lat, activeStudent.lng);
+                    const arcPath = getSvgArc(originP, destP);
+                    const arcColor = activeStudent.status === 'enrolled' ? '#eab308' : '#f97316';
+                    return (
+                      <g>
+                        <path
+                          d={arcPath}
+                          fill="none"
+                          stroke={arcColor}
+                          strokeWidth="2.5"
+                          strokeDasharray="6 4"
+                          className="animate-pulse"
+                        />
+                      </g>
+                    );
+                  })()}
 
-                {/* University Target Pins */}
-                {ABROAD_STUDENTS.map((s, idx) => {
-                  const p = projectTo2D(s.lat, s.lng);
-                  const isSelected = idx === currentIndex;
-                  const color = s.status === 'enrolled' ? '#10b981' : '#f59e0b';
-                  return (
-                    <g
-                      key={s.id}
-                      onClick={() => handleChipClick(idx)}
-                      className="cursor-pointer transition-transform hover:scale-125"
-                    >
-                      {isSelected && (
-                        <>
-                          <circle cx={p.x} cy={p.y} r="14" fill="none" stroke={color} strokeWidth="1.5" className="animate-ping" />
-                          <circle cx={p.x} cy={p.y} r="10" fill="none" stroke="#3b82f6" strokeWidth="2" />
-                        </>
-                      )}
-                      <circle cx={p.x} cy={p.y} r={isSelected ? "6" : "4.5"} fill={color} stroke="#ffffff" strokeWidth="1" />
-                      <text x={p.x + 7} y={p.y + 3} fill={isSelected ? '#3b82f6' : '#94a3b8'} fontSize="8" fontFamily="monospace" fontWeight={isSelected ? 'bold' : 'normal'}>
-                        {s.shortName}
-                      </text>
-                    </g>
-                  );
-                })}
-              </svg>
+                  {/* Xonqa IM Base Pin */}
+                  <g>
+                    <circle cx={originP.x} cy={originP.y} r="9" fill="#10b981" opacity="0.25" className="animate-ping" />
+                    <circle cx={originP.x} cy={originP.y} r="5" fill="#10b981" stroke="#ffffff" strokeWidth="1.5" />
+                    <text x={originP.x + 8} y={originP.y - 6} fill="#10b981" fontSize="10" fontFamily="monospace" fontWeight="bold">
+                      Xonqa IM Base
+                    </text>
+                  </g>
+
+                  {/* University Pins */}
+                  {ABROAD_STUDENTS.map((s, idx) => {
+                    const p = projectTo2D(s.lat, s.lng);
+                    const isSelected = idx === currentIndex;
+                    const isEnrolled = s.status === 'enrolled';
+                    const color = isEnrolled ? '#eab308' : '#f97316';
+                    const showLabel = isSelected || zoom >= 2.5;
+
+                    return (
+                      <g
+                        key={s.id}
+                        onClick={() => handleChipClick(idx)}
+                        className="cursor-pointer group"
+                      >
+                        {isSelected && (
+                          <>
+                            <circle cx={p.x} cy={p.y} r="15" fill="none" stroke={color} strokeWidth="1.5" className="animate-ping" />
+                            <circle cx={p.x} cy={p.y} r="11" fill="none" stroke="#3b82f6" strokeWidth="2" />
+                          </>
+                        )}
+                        <circle cx={p.x} cy={p.y} r={isSelected ? "6.5" : "5"} fill={color} stroke="#ffffff" strokeWidth="1.5" />
+
+                        {showLabel && (
+                          <g transform={`translate(${p.x + 8}, ${p.y - 4})`}>
+                            <rect
+                              x="0"
+                              y="-10"
+                              width={s.shortName.length * 7 + 12}
+                              height="16"
+                              rx="4"
+                              fill="#090d16"
+                              stroke={isSelected ? '#3b82f6' : '#334155'}
+                              strokeWidth="1"
+                            />
+                            <text
+                              x="6"
+                              y="2"
+                              fill={isSelected ? '#3b82f6' : '#f8fafc'}
+                              fontSize="9"
+                              fontFamily="monospace"
+                              fontWeight={isSelected ? 'bold' : 'normal'}
+                            >
+                              {s.shortName}
+                            </text>
+                          </g>
+                        )}
+                      </g>
+                    );
+                  })}
+                </svg>
+              </div>
             </div>
           ) : (
             /* DESKTOP 3D WEBGL GLOBE (>= 768px) */
@@ -372,11 +491,11 @@ export default function GlobalRadar3D() {
           {/* Quick Legend Overlay */}
           <div className="absolute bottom-3 left-3 p-2.5 sm:p-3 rounded-2xl bg-zinc-950/90 border border-white/10 text-[10px] sm:text-[11px] font-mono text-white/80 space-y-1 z-10">
             <div className="flex items-center gap-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
+              <span className="w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse" />
               <span>{t('achievements', 'enrolled')}</span>
             </div>
             <div className="flex items-center gap-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-amber-500" />
+              <span className="w-2.5 h-2.5 rounded-full bg-orange-500" />
               <span>{t('achievements', 'offerReceived')}</span>
             </div>
           </div>
