@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Camera, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Camera, ChevronLeft, ChevronRight, LayoutGrid } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
 
 const BASE_GALLERY_ITEMS = [
@@ -81,6 +81,7 @@ function GalleryCard({ item }) {
         alt={item.title}
         decoding="async"
         loading="lazy"
+        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
         className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
       />
       <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent pointer-events-none" />
@@ -140,6 +141,7 @@ function GalleryCard({ item }) {
 export default function PublicGalleryPage() {
   const { t, translations } = useLanguage();
   const [selectedCategory, setSelectedCategory] = useState('all');
+  const [displayLimit, setDisplayLimit] = useState(6);
 
   const galleryCategories = [
     { id: 'all', label: t('gallery', 'categories')?.all || 'All Photos' },
@@ -161,6 +163,8 @@ export default function PublicGalleryPage() {
   const filteredItems = galleryItems.filter(
     (item) => selectedCategory === 'all' || item.category === selectedCategory
   );
+
+  const visibleItems = filteredItems.slice(0, displayLimit);
 
   return (
     <div className="w-full max-w-7xl mx-auto px-6 py-12 flex flex-col justify-center min-h-[calc(100vh-4rem)]">
@@ -184,7 +188,10 @@ export default function PublicGalleryPage() {
             return (
               <button
                 key={cat.id}
-                onClick={() => setSelectedCategory(cat.id)}
+                onClick={() => {
+                  setSelectedCategory(cat.id);
+                  setDisplayLimit(6);
+                }}
                 className={`px-4 py-2 rounded-xl text-xs font-medium transition-all border cursor-pointer ${
                   isActive
                     ? 'bg-amber-500/15 border-amber-500/50 text-amber-400 shadow-md'
@@ -200,10 +207,23 @@ export default function PublicGalleryPage() {
 
       {/* Cards Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredItems.map((item) => (
+        {visibleItems.map((item) => (
           <GalleryCard key={item.id} item={item} />
         ))}
       </div>
+
+      {/* Expand / View All Items Button */}
+      {filteredItems.length > displayLimit && (
+        <div className="mt-8 text-center">
+          <button
+            onClick={() => setDisplayLimit((prev) => prev + 6)}
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-2xl bg-amber-500/15 border border-amber-500/30 text-amber-400 text-xs font-mono font-bold hover:bg-amber-500 hover:text-black transition-all cursor-pointer shadow-md"
+          >
+            <LayoutGrid className="w-4 h-4" />
+            <span>Show More Photos ({filteredItems.length - displayLimit} remaining)</span>
+          </button>
+        </div>
+      )}
 
     </div>
   );

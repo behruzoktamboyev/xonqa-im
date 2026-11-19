@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import {
   GraduationCap,
@@ -95,6 +96,25 @@ function SocialBadge({ platform }) {
 
 export default function Home() {
   const { t, translations } = useLanguage();
+  const marqueeRef = useRef(null);
+  const [isMarqueeVisible, setIsMarqueeVisible] = useState(false);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsMarqueeVisible(entry.isIntersecting);
+      },
+      { threshold: 0.05 }
+    );
+
+    if (marqueeRef.current) {
+      observer.observe(marqueeRef.current);
+    }
+
+    return () => {
+      if (marqueeRef.current) observer.unobserve(marqueeRef.current);
+    };
+  }, []);
 
   const socialFeed = RAW_SOCIAL_FEED.map((item) => {
     const translation = translations?.hero?.socialFeed?.[item.id] || {};
@@ -113,21 +133,21 @@ export default function Home() {
       {/* HERO SECTION */}
       <section className="relative min-h-[calc(100vh-4rem)] flex flex-col justify-between overflow-hidden">
         
-        {/* Integrated Right-Side Floating Gallery */}
-        <div className="absolute right-0 top-0 bottom-0 w-full md:w-3/5 lg:w-1/2 pointer-events-none z-0 overflow-hidden flex items-center justify-end">
+        {/* Integrated Right-Side Floating Gallery (Hidden on mobile <640px to eliminate DOM bloat & scroll lag) */}
+        <div className="hidden sm:flex absolute right-0 top-0 bottom-0 w-full md:w-3/5 lg:w-1/2 pointer-events-none z-0 overflow-hidden items-center justify-end">
           <div className="relative w-[130%] h-[130%] md:w-[150%] flex items-center justify-center -rotate-6 scale-105 opacity-30 md:opacity-60 transition-transform duration-700 will-change-transform">
              <div className="grid grid-cols-3 gap-3 md:gap-6">
                 <div className="flex flex-col gap-3 md:gap-6 -mt-24">
-                   <img src="lesson_5.webp" decoding="async" loading="lazy" className="rounded-3xl object-cover w-32 h-48 md:w-48 md:h-64 shadow-lg border border-white/5" alt="Demo 1" />
-                   <img src="lesson_6.webp" decoding="async" loading="lazy" className="rounded-3xl object-cover w-32 h-56 md:w-48 md:h-80 shadow-lg border border-white/5" alt="Demo 2" />
+                   <img src="lesson_5.webp" decoding="async" loading="lazy" sizes="(max-width: 768px) 100vw, 33vw" className="rounded-3xl object-cover w-32 h-48 md:w-48 md:h-64 shadow-md border border-white/5" alt="Campus Life 1" />
+                   <img src="lesson_6.webp" decoding="async" loading="lazy" sizes="(max-width: 768px) 100vw, 33vw" className="rounded-3xl object-cover w-32 h-56 md:w-48 md:h-80 shadow-md border border-white/5" alt="Campus Life 2" />
                 </div>
                 <div className="flex flex-col gap-3 md:gap-6 mt-12">
-                   <img src="lesson_4.webp" decoding="async" loading="lazy" className="rounded-3xl object-cover w-32 h-56 md:w-48 md:h-80 shadow-lg border border-white/5" alt="Demo 3" />
-                   <img src="lesson_3.webp" decoding="async" loading="lazy" className="rounded-3xl object-cover w-32 h-48 md:w-48 md:h-64 shadow-lg border border-white/5" alt="Demo 4" />
+                   <img src="lesson_4.webp" decoding="async" loading="lazy" sizes="(max-width: 768px) 100vw, 33vw" className="rounded-3xl object-cover w-32 h-56 md:w-48 md:h-80 shadow-md border border-white/5" alt="Campus Life 3" />
+                   <img src="lesson_3.webp" decoding="async" loading="lazy" sizes="(max-width: 768px) 100vw, 33vw" className="rounded-3xl object-cover w-32 h-48 md:w-48 md:h-64 shadow-md border border-white/5" alt="Campus Life 4" />
                 </div>
                 <div className="flex flex-col gap-3 md:gap-6 -mt-16">
-                   <img src="lesson_2.webp" decoding="async" loading="lazy" className="rounded-3xl object-cover w-32 h-48 md:w-48 md:h-64 shadow-lg border border-white/5" alt="Demo 5" />
-                   <img src="lesson_1.webp" decoding="async" loading="lazy" className="rounded-3xl object-cover w-32 h-56 md:w-48 md:h-80 shadow-lg border border-white/5" alt="Demo 6" />
+                   <img src="lesson_2.webp" decoding="async" loading="lazy" sizes="(max-width: 768px) 100vw, 33vw" className="rounded-3xl object-cover w-32 h-48 md:w-48 md:h-64 shadow-md border border-white/5" alt="Campus Life 5" />
+                   <img src="lesson_1.webp" decoding="async" loading="lazy" sizes="(max-width: 768px) 100vw, 33vw" className="rounded-3xl object-cover w-32 h-56 md:w-48 md:h-80 shadow-md border border-white/5" alt="Campus Life 6" />
                 </div>
              </div>
           </div>
@@ -140,7 +160,7 @@ export default function Home() {
         {/* Hero Content Layer */}
         <div className="relative z-10 px-6 pt-12 pb-6 max-w-7xl mx-auto w-full my-auto">
           <div className="max-w-2xl space-y-6">
-            <div className="inline-flex items-center gap-2 px-3.5 py-2 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-500 text-[10px] sm:text-xs font-mono font-bold tracking-wider uppercase backdrop-blur-none sm:backdrop-blur-md">
+            <div className="inline-flex items-center gap-2 px-3.5 py-2 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-500 text-[10px] sm:text-xs font-mono font-bold tracking-wider uppercase bg-zinc-950/90 md:backdrop-blur-md">
               <GraduationCap className="w-4 h-4 shrink-0 text-amber-500" />
               <span className="leading-tight">
                 {t('hero', 'agencyBadge')}
@@ -169,13 +189,13 @@ export default function Home() {
           </div>
         </div>
 
-        {/* MARQUEE TICKER */}
-        <div className="relative z-10 w-full py-8 mt-auto">
+        {/* MARQUEE TICKER (Pauses animation automatically when off-screen) */}
+        <div ref={marqueeRef} className="relative z-10 w-full py-8 mt-auto">
           <div className="pointer-events-none absolute left-0 top-0 bottom-0 w-16 md:w-32 bg-gradient-to-r from-[var(--bg-page)] to-transparent z-20" />
           <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-16 md:w-32 bg-gradient-to-l from-[var(--bg-page)] to-transparent z-20" />
 
           <div className="overflow-hidden w-full">
-            <div className="animate-marquee transform-gpu will-change-transform gap-6 pl-6">
+            <div className={`transform-gpu gap-6 pl-6 ${isMarqueeVisible ? 'animate-marquee' : 'flex'}`}>
               {marqueeItems.map((item, index) => (
                 <a
                   key={`${item.id}-${index}`}
@@ -188,12 +208,13 @@ export default function Home() {
                     <SocialBadge platform={item.platform} />
                   </div>
 
-                  <div className="w-full h-[300px] md:h-[340px] rounded-3xl overflow-hidden relative bg-zinc-900 border-none outline-none ring-0 shadow-lg isolate transform-gpu transition-transform duration-300 group-hover:-translate-y-1">
+                  <div className="w-full h-[300px] md:h-[340px] rounded-3xl overflow-hidden relative bg-zinc-900 border-none outline-none ring-0 shadow-md isolate transform-gpu transition-transform duration-300 group-hover:-translate-y-1">
                     <img
                       src={item.imageUrl}
                       alt={item.title}
                       decoding="async"
                       loading="lazy"
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                       className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                     />
 

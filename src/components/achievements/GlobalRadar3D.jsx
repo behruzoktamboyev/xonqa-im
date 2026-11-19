@@ -24,9 +24,11 @@ const Globe = dynamic(() => import('react-globe.gl'), { ssr: false });
 export default function GlobalRadar3D() {
   const { t, translations } = useLanguage();
   const globeRef = useRef();
+  const containerRef = useRef();
   const [currentIndex, setCurrentIndex] = useState(0); // Default to first
   const [countries, setCountries] = useState({ features: [] });
   const [mounted, setMounted] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
   const [globeDimensions, setGlobeDimensions] = useState({ width: 650, height: 520 });
 
   // Custom Sky Blue Globe Material for Oceans
@@ -37,15 +39,27 @@ export default function GlobalRadar3D() {
     });
   }, []);
 
-  // Fetch world country border polygons & handle responsive dimensions
+  // IntersectionObserver to pause 3D WebGL Globe rendering when off-screen
   useEffect(() => {
     setMounted(true);
+
     fetch(
       'https://raw.githubusercontent.com/vasturiano/react-globe.gl/master/example/datasets/ne_110m_admin_0_countries.geojson'
     )
       .then((res) => res.json())
       .then((data) => setCountries(data))
       .catch((err) => console.error('Error loading world borders:', err));
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsVisible(entry.isIntersecting);
+      },
+      { threshold: 0.1 }
+    );
+
+    if (containerRef.current) {
+      observer.observe(containerRef.current);
+    }
 
     const updateDimensions = () => {
       if (typeof window !== 'undefined') {
@@ -61,14 +75,18 @@ export default function GlobalRadar3D() {
 
     updateDimensions();
     window.addEventListener('resize', updateDimensions);
-    return () => window.removeEventListener('resize', updateDimensions);
+
+    return () => {
+      if (containerRef.current) observer.unobserve(containerRef.current);
+      window.removeEventListener('resize', updateDimensions);
+    };
   }, []);
 
   const activeStudent = currentIndex !== null ? ABROAD_STUDENTS[currentIndex] : null;
 
   // Camera handling
   useEffect(() => {
-    if (globeRef.current) {
+    if (globeRef.current && isVisible) {
       if (activeStudent) {
         globeRef.current.pointOfView(
           { lat: activeStudent.lat, lng: activeStudent.lng, altitude: 2.1 },
@@ -81,7 +99,7 @@ export default function GlobalRadar3D() {
         );
       }
     }
-  }, [currentIndex, activeStudent]);
+  }, [currentIndex, activeStudent, isVisible]);
 
   const handleChipClick = (index) => {
     if (currentIndex === index) {
@@ -147,7 +165,7 @@ export default function GlobalRadar3D() {
   ];
 
   return (
-    <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-6 overflow-hidden">
+    <div ref={containerRef} className="w-full max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-6 overflow-hidden">
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-4 border-b theme-border">
         <div>
@@ -202,7 +220,7 @@ export default function GlobalRadar3D() {
         
         {/* LEFT SIDE: Interactive 3D Globe */}
         <div className="lg:col-span-7 relative w-full h-[340px] sm:h-[420px] lg:h-[520px] rounded-3xl theme-bg-card border theme-border overflow-hidden flex items-center justify-center shadow-lg">
-          {mounted ? (
+          {mounted && isVisible ? (
             <Globe
               ref={globeRef}
               backgroundColor="rgba(0,0,0,0)"
@@ -242,12 +260,12 @@ export default function GlobalRadar3D() {
             />
           ) : (
             <div className="text-xs font-mono text-emerald-400 flex items-center gap-2">
-              <Sparkles className="w-4 h-4 animate-spin" /> Rendering Vector 3D Globe...
+              <Sparkles className="w-4 h-4 animate-spin" /> {mounted ? '3D Radar (Paused off-screen)' : 'Rendering Vector 3D Globe...'}
             </div>
           )}
 
           {/* Quick Legend Overlay */}
-          <div className="absolute bottom-3 left-3 p-2.5 sm:p-3 rounded-2xl bg-black/60 backdrop-blur-none sm:backdrop-blur-md border border-white/10 text-[10px] sm:text-[11px] font-mono text-white/80 space-y-1 z-10">
+          <div className="absolute bottom-3 left-3 p-2.5 sm:p-3 rounded-2xl bg-zinc-950/90 border border-white/10 text-[10px] sm:text-[11px] font-mono text-white/80 space-y-1 z-10">
             <div className="flex items-center gap-2">
               <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
               <span>{t('achievements', 'enrolled')}</span>
@@ -307,6 +325,7 @@ export default function GlobalRadar3D() {
                         alt={activeStudent.studentName}
                         decoding="async"
                         loading="lazy"
+                        sizes="(max-width: 768px) 100vw, 50vw"
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
@@ -328,6 +347,7 @@ export default function GlobalRadar3D() {
                       alt={activeStudent.university}
                       decoding="async"
                       loading="lazy"
+                      sizes="(max-width: 768px) 100vw, 50vw"
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
