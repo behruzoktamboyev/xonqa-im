@@ -15,11 +15,25 @@ import {
   CheckCircle2,
   BookmarkCheck,
   User,
+  Radar,
 } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
 
 // Dynamically import Globe to prevent SSR issues
 const Globe = dynamic(() => import('react-globe.gl'), { ssr: false });
+
+function projectTo2D(lat, lng) {
+  const x = 200 + (lng / 180) * 160;
+  const y = 140 - (lat / 90) * 110;
+  return { x, y };
+}
+
+function getSvgArc(p1, p2) {
+  const dx = p2.x - p1.x;
+  const cx = (p1.x + p2.x) / 2;
+  const cy = (p1.y + p2.y) / 2 - Math.abs(dx) * 0.25 - 15;
+  return `M ${p1.x} ${p1.y} Q ${cx} ${cy} ${p2.x} ${p2.y}`;
+}
 
 export default function GlobalRadar3D() {
   const { t, translations } = useLanguage();
@@ -29,6 +43,7 @@ export default function GlobalRadar3D() {
   const [countries, setCountries] = useState({ features: [] });
   const [mounted, setMounted] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const [globeDimensions, setGlobeDimensions] = useState({ width: 650, height: 520 });
 
   // Custom Sky Blue Globe Material for Oceans
@@ -39,7 +54,6 @@ export default function GlobalRadar3D() {
     });
   }, []);
 
-  // IntersectionObserver to pause 3D WebGL Globe rendering when off-screen
   useEffect(() => {
     setMounted(true);
 
@@ -63,6 +77,8 @@ export default function GlobalRadar3D() {
 
     const updateDimensions = () => {
       if (typeof window !== 'undefined') {
+        const mobileCheck = window.innerWidth < 768;
+        setIsMobile(mobileCheck);
         if (window.innerWidth < 640) {
           setGlobeDimensions({ width: window.innerWidth - 48, height: 340 });
         } else if (window.innerWidth < 1024) {
@@ -84,9 +100,9 @@ export default function GlobalRadar3D() {
 
   const activeStudent = currentIndex !== null ? ABROAD_STUDENTS[currentIndex] : null;
 
-  // Camera handling
+  // Camera handling for 3D Globe (desktop)
   useEffect(() => {
-    if (globeRef.current && isVisible) {
+    if (globeRef.current && isVisible && !isMobile) {
       if (activeStudent) {
         globeRef.current.pointOfView(
           { lat: activeStudent.lat, lng: activeStudent.lng, altitude: 2.1 },
@@ -99,7 +115,7 @@ export default function GlobalRadar3D() {
         );
       }
     }
-  }, [currentIndex, activeStudent, isVisible]);
+  }, [currentIndex, activeStudent, isVisible, isMobile]);
 
   const handleChipClick = (index) => {
     if (currentIndex === index) {
@@ -164,6 +180,8 @@ export default function GlobalRadar3D() {
     }),
   ];
 
+  const originP = projectTo2D(XORAZM_ORIGIN.lat, XORAZM_ORIGIN.lng);
+
   return (
     <div ref={containerRef} className="w-full max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-6 overflow-hidden">
       {/* Header */}
@@ -218,50 +236,137 @@ export default function GlobalRadar3D() {
       {/* Main Split View */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch w-full max-w-full">
         
-        {/* LEFT SIDE: Interactive 3D Globe */}
-        <div className="lg:col-span-7 relative w-full h-[340px] sm:h-[420px] lg:h-[520px] rounded-3xl theme-bg-card border theme-border overflow-hidden flex items-center justify-center shadow-lg">
-          {mounted && isVisible ? (
-            <Globe
-              ref={globeRef}
-              backgroundColor="rgba(0,0,0,0)"
-              globeMaterial={customGlobeMaterial}
-              width={globeDimensions.width}
-              height={globeDimensions.height}
-              showAtmosphere={true}
-              atmosphereColor="#60a5fa"
-              atmosphereAltitude={0.14}
-              
-              polygonsData={countries.features}
-              polygonCapColor={() => '#f8fafc'}
-              polygonSideColor={() => '#e2e8f0'}
-              polygonStrokeColor={() => '#94a3b8'}
-              
-              arcsData={singleArcData}
-              arcColor="color"
-              arcDashLength={1}
-              arcDashGap={0}
-              arcDashAnimateTime={0}
-              arcStroke={2.5}
-              
-              pointsData={pointsData}
-              pointColor="color"
-              pointRadius="size"
-              pointAltitude={0.015}
-              pointResolution={24}
-              onPointClick={(pt) => {
-                if (pt.studentIndex !== undefined) {
-                  if (currentIndex === pt.studentIndex) {
-                    setCurrentIndex(null);
-                  } else {
-                    setCurrentIndex(pt.studentIndex);
-                  }
-                }
-              }}
-            />
-          ) : (
-            <div className="text-xs font-mono text-emerald-400 flex items-center gap-2">
-              <Sparkles className="w-4 h-4 animate-spin" /> {mounted ? '3D Radar (Paused off-screen)' : 'Rendering Vector 3D Globe...'}
+        {/* LEFT SIDE: Interactive Radar View (3D on Desktop >=768px, Interactive 2D SVG Radar on Mobile <768px) */}
+        <div className="lg:col-span-7 relative w-full h-[340px] sm:h-[420px] lg:h-[520px] rounded-3xl bg-[#0a0f18] border border-white/10 overflow-hidden flex items-center justify-center shadow-lg">
+
+          {/* MOBILE INTERACTIVE 2D SVG RADAR (< 768px) */}
+          {isMobile ? (
+            <div className="relative w-full h-full p-4 flex flex-col items-center justify-center">
+              <svg viewBox="0 0 400 280" className="w-full h-full max-h-[300px]">
+                <defs>
+                  <linearGradient id="radarSweep" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="#10b981" stopOpacity="0.4" />
+                    <stop offset="100%" stopColor="#10b981" stopOpacity="0" />
+                  </linearGradient>
+                </defs>
+
+                {/* Radar Concentric Circles */}
+                <circle cx="200" cy="140" r="40" fill="none" stroke="#1e293b" strokeWidth="1" strokeDasharray="4 4" />
+                <circle cx="200" cy="140" r="80" fill="none" stroke="#1e293b" strokeWidth="1" strokeDasharray="4 4" />
+                <circle cx="200" cy="140" r="120" fill="none" stroke="#334155" strokeWidth="1" />
+                <circle cx="200" cy="140" r="160" fill="none" stroke="#1e293b" strokeWidth="1" strokeDasharray="4 4" />
+
+                {/* Lat/Lng Axis Crosshairs */}
+                <line x1="20" y1="140" x2="380" y2="140" stroke="#334155" strokeWidth="1" strokeDasharray="2 4" />
+                <line x1="200" y1="20" x2="200" y2="260" stroke="#334155" strokeWidth="1" strokeDasharray="2 4" />
+
+                {/* Rotating Sweep Line */}
+                <line x1="200" y1="140" x2="360" y2="80" stroke="#10b981" strokeWidth="1.5" opacity="0.6">
+                  <animateTransform
+                    attributeName="transform"
+                    type="rotate"
+                    from="0 200 140"
+                    to="360 200 140"
+                    dur="6s"
+                    repeatCount="indefinite"
+                  />
+                </line>
+
+                {/* Trajectory Arc to Selected University */}
+                {activeStudent && (() => {
+                  const destP = projectTo2D(activeStudent.lat, activeStudent.lng);
+                  const arcPath = getSvgArc(originP, destP);
+                  const arcColor = activeStudent.status === 'enrolled' ? '#10b981' : '#f59e0b';
+                  return (
+                    <g>
+                      <path
+                        d={arcPath}
+                        fill="none"
+                        stroke={arcColor}
+                        strokeWidth="2"
+                        strokeDasharray="5 3"
+                        className="animate-pulse"
+                      />
+                    </g>
+                  );
+                })()}
+
+                {/* Origin Base Pin (Xorazm) */}
+                <g>
+                  <circle cx={originP.x} cy={originP.y} r="8" fill="#10b981" opacity="0.2" className="animate-ping" />
+                  <circle cx={originP.x} cy={originP.y} r="5" fill="#059669" stroke="#ffffff" strokeWidth="1.5" />
+                  <text x={originP.x + 8} y={originP.y - 6} fill="#10b981" fontSize="9" fontFamily="monospace" fontWeight="bold">
+                    Xonqa IM Base
+                  </text>
+                </g>
+
+                {/* University Target Pins */}
+                {ABROAD_STUDENTS.map((s, idx) => {
+                  const p = projectTo2D(s.lat, s.lng);
+                  const isSelected = idx === currentIndex;
+                  const color = s.status === 'enrolled' ? '#10b981' : '#f59e0b';
+                  return (
+                    <g
+                      key={s.id}
+                      onClick={() => handleChipClick(idx)}
+                      className="cursor-pointer transition-transform hover:scale-125"
+                    >
+                      {isSelected && (
+                        <>
+                          <circle cx={p.x} cy={p.y} r="14" fill="none" stroke={color} strokeWidth="1.5" className="animate-ping" />
+                          <circle cx={p.x} cy={p.y} r="10" fill="none" stroke="#3b82f6" strokeWidth="2" />
+                        </>
+                      )}
+                      <circle cx={p.x} cy={p.y} r={isSelected ? "6" : "4.5"} fill={color} stroke="#ffffff" strokeWidth="1" />
+                      <text x={p.x + 7} y={p.y + 3} fill={isSelected ? '#3b82f6' : '#94a3b8'} fontSize="8" fontFamily="monospace" fontWeight={isSelected ? 'bold' : 'normal'}>
+                        {s.shortName}
+                      </text>
+                    </g>
+                  );
+                })}
+              </svg>
             </div>
+          ) : (
+            /* DESKTOP 3D WEBGL GLOBE (>= 768px) */
+            mounted && isVisible && (
+              <Globe
+                ref={globeRef}
+                backgroundColor="rgba(0,0,0,0)"
+                globeMaterial={customGlobeMaterial}
+                width={globeDimensions.width}
+                height={globeDimensions.height}
+                showAtmosphere={true}
+                atmosphereColor="#60a5fa"
+                atmosphereAltitude={0.14}
+
+                polygonsData={countries.features}
+                polygonCapColor={() => '#f8fafc'}
+                polygonSideColor={() => '#e2e8f0'}
+                polygonStrokeColor={() => '#94a3b8'}
+
+                arcsData={singleArcData}
+                arcColor="color"
+                arcDashLength={1}
+                arcDashGap={0}
+                arcDashAnimateTime={0}
+                arcStroke={2.5}
+
+                pointsData={pointsData}
+                pointColor="color"
+                pointRadius="size"
+                pointAltitude={0.015}
+                pointResolution={24}
+                onPointClick={(pt) => {
+                  if (pt.studentIndex !== undefined) {
+                    if (currentIndex === pt.studentIndex) {
+                      setCurrentIndex(null);
+                    } else {
+                      setCurrentIndex(pt.studentIndex);
+                    }
+                  }
+                }}
+              />
+            )
           )}
 
           {/* Quick Legend Overlay */}

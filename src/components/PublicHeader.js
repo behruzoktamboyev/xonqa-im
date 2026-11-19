@@ -62,7 +62,7 @@ export default function PublicHeader() {
   };
 
   return (
-    <header className="flex items-center justify-between px-4 sm:px-6 py-3.5 border-b theme-border theme-bg-page/98 md:backdrop-blur-md sticky top-0 z-50 transition-all">
+    <header className="flex items-center justify-between px-4 sm:px-6 py-3.5 border-b theme-border theme-bg-nav sticky top-0 z-50 transition-all shadow-md">
       {/* School Brand Logo */}
       <Link href="/" className="flex items-center gap-2.5 sm:gap-3 hover:opacity-80 transition-opacity min-w-0">
         <div className="relative w-8 h-8 sm:w-10 sm:h-10 rounded-xl overflow-hidden shrink-0 flex items-center justify-center">
@@ -155,7 +155,7 @@ export default function PublicHeader() {
 
           {/* Language Dropdown Menu */}
           {langMenuOpen && (
-            <div className="absolute right-0 mt-2 w-36 rounded-2xl border theme-border theme-bg-card shadow-2xl p-1.5 space-y-1 z-50 bg-zinc-950/98 md:backdrop-blur-xl animate-in fade-in duration-150">
+            <div className="absolute right-0 mt-2 w-36 rounded-2xl border theme-border theme-bg-card shadow-2xl p-1.5 space-y-1 z-50 animate-in fade-in duration-150">
               {LANGUAGES.map((item) => (
                 <button
                   key={item.code}
@@ -214,7 +214,7 @@ export default function PublicHeader() {
 
       {/* MOBILE EXPANDABLE NAVIGATION MENU */}
       {mobileMenuOpen && (
-        <div className="absolute top-full left-0 right-0 border-b theme-border theme-bg-page p-4 shadow-2xl z-50 flex flex-col gap-3 bg-zinc-950/98 md:backdrop-blur-2xl animate-in slide-in-from-top-2 duration-200 lg:hidden">
+        <div className="absolute top-full left-0 right-0 border-b theme-border theme-bg-nav p-4 shadow-2xl z-50 flex flex-col gap-3 animate-in slide-in-from-top-2 duration-200 lg:hidden">
           <a
             href="#teachers-team"
             onClick={(e) => scrollToSection(e, 'teachers-team')}
