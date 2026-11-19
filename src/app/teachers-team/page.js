@@ -68,7 +68,7 @@ export default function TeachersPage() {
           return (
             <div
               key={teacher.id}
-              className="group theme-bg-card border theme-border rounded-3xl overflow-hidden hover:border-emerald-500/50 transition-all duration-300 shadow-lg hover:shadow-2xl flex flex-col justify-between"
+              className="group theme-bg-card border theme-border rounded-3xl overflow-hidden hover:border-emerald-500/50 transition-all duration-300 shadow-md flex flex-col justify-between"
             >
               {/* Teacher Photo */}
               <div className="relative w-full h-64 bg-black/40 overflow-hidden flex items-center justify-center">
@@ -76,6 +76,8 @@ export default function TeachersPage() {
                   <img
                     src={teacher.imageUrl}
                     alt={teacher.name}
+                    decoding="async"
+                    loading="lazy"
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />
                 ) : (
@@ -84,7 +86,7 @@ export default function TeachersPage() {
                   </div>
                 )}
 
-                <div className="absolute top-3 right-3 bg-black/70 backdrop-blur-md border border-white/10 px-2.5 py-1 rounded-full text-[10px] font-mono font-bold text-amber-400 flex items-center gap-1">
+                <div className="absolute top-3 right-3 bg-black/70 backdrop-blur-none sm:backdrop-blur-md border border-white/10 px-2.5 py-1 rounded-full text-[10px] font-mono font-bold text-amber-400 flex items-center gap-1">
                   <Award className="w-3 h-3 text-amber-400" />
                   <span>{teacher.experience} {t('teachers', 'experience')}</span>
                 </div>

@@ -15,7 +15,7 @@ export default function Footer() {
       <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-6">
         {/* Creator Rectangle Button */}
         <a
-          href="https://haanzo0431.github.io/personal-website/index.html"
+          href="https://behruzoktamboyev.github.io/personal-website/"
           target="_blank"
           rel="noopener noreferrer"
           className="px-3 py-1.5 border border-zinc-700/60 bg-zinc-900/50 hover:bg-amber-500 hover:border-amber-500 hover:text-black text-[10px] font-mono text-zinc-400 flex items-center gap-1.5 rounded-[2px] transition-all duration-300 shadow-sm group"

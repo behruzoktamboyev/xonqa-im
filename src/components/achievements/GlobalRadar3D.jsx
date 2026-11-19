@@ -201,7 +201,7 @@ export default function GlobalRadar3D() {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch w-full max-w-full">
         
         {/* LEFT SIDE: Interactive 3D Globe */}
-        <div className="lg:col-span-7 relative w-full h-[340px] sm:h-[420px] lg:h-[520px] rounded-3xl theme-bg-card border theme-border overflow-hidden flex items-center justify-center shadow-2xl">
+        <div className="lg:col-span-7 relative w-full h-[340px] sm:h-[420px] lg:h-[520px] rounded-3xl theme-bg-card border theme-border overflow-hidden flex items-center justify-center shadow-lg">
           {mounted ? (
             <Globe
               ref={globeRef}
@@ -229,7 +229,7 @@ export default function GlobalRadar3D() {
               pointColor="color"
               pointRadius="size"
               pointAltitude={0.015}
-              pointResolution={32}
+              pointResolution={24}
               onPointClick={(pt) => {
                 if (pt.studentIndex !== undefined) {
                   if (currentIndex === pt.studentIndex) {
@@ -247,7 +247,7 @@ export default function GlobalRadar3D() {
           )}
 
           {/* Quick Legend Overlay */}
-          <div className="absolute bottom-3 left-3 p-2.5 sm:p-3 rounded-2xl bg-black/60 backdrop-blur-md border border-white/10 text-[10px] sm:text-[11px] font-mono text-white/80 space-y-1 z-10">
+          <div className="absolute bottom-3 left-3 p-2.5 sm:p-3 rounded-2xl bg-black/60 backdrop-blur-none sm:backdrop-blur-md border border-white/10 text-[10px] sm:text-[11px] font-mono text-white/80 space-y-1 z-10">
             <div className="flex items-center gap-2">
               <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
               <span>{t('achievements', 'enrolled')}</span>
@@ -282,7 +282,7 @@ export default function GlobalRadar3D() {
 
                 {/* Status Badge */}
                 {activeStudent.status === 'enrolled' ? (
-                  <span className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full bg-emerald-500/15 border border-emerald-500/40 text-emerald-400 text-[11px] sm:text-xs font-mono font-bold shrink-0 shadow-lg shadow-emerald-500/10">
+                  <span className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full bg-emerald-500/15 border border-emerald-500/40 text-emerald-400 text-[11px] sm:text-xs font-mono font-bold shrink-0 shadow-md">
                     <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" /> {t('achievements', 'enrolled')}
                   </span>
                 ) : (
@@ -305,6 +305,8 @@ export default function GlobalRadar3D() {
                       <img
                         src={activeStudent.studentPhoto}
                         alt={activeStudent.studentName}
+                        decoding="async"
+                        loading="lazy"
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
@@ -324,6 +326,8 @@ export default function GlobalRadar3D() {
                     <img
                       src={activeStudent.uniPhoto}
                       alt={activeStudent.university}
+                      decoding="async"
+                      loading="lazy"
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
@@ -426,7 +430,7 @@ export default function GlobalRadar3D() {
 
             <button
               onClick={handleNext}
-              className="px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-black text-xs font-mono font-bold flex items-center gap-1.5 sm:gap-2 transition-all shadow-lg shadow-emerald-500/20 cursor-pointer group"
+              className="px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-black text-xs font-mono font-bold flex items-center gap-1.5 sm:gap-2 transition-all shadow-md cursor-pointer group"
             >
               {t('achievements', 'next')}
               <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />

@@ -79,6 +79,8 @@ function GalleryCard({ item }) {
       <img
         src={item.images[currentIdx]}
         alt={item.title}
+        decoding="async"
+        loading="lazy"
         className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
       />
       <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent pointer-events-none" />
@@ -95,7 +97,7 @@ function GalleryCard({ item }) {
               }}
               aria-label={`Go to photo ${i + 1}`}
               className={`h-1.5 flex-1 rounded-full transition-all cursor-pointer ${
-                i === currentIdx ? 'bg-amber-400 shadow-md scale-y-110' : 'bg-white/40 hover:bg-white/70 backdrop-blur-sm'
+                i === currentIdx ? 'bg-amber-400 scale-y-110' : 'bg-white/40 hover:bg-white/70'
               }`}
             />
           ))}
@@ -108,14 +110,14 @@ function GalleryCard({ item }) {
           <button
             onClick={handlePrev}
             aria-label="Previous Photo"
-            className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-black/70 hover:bg-amber-500 hover:text-black text-white flex items-center justify-center transition-all opacity-90 sm:opacity-0 sm:group-hover:opacity-100 cursor-pointer z-20 backdrop-blur-md border border-white/20 shadow-lg active:scale-95"
+            className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-black/70 hover:bg-amber-500 hover:text-black text-white flex items-center justify-center transition-all opacity-90 sm:opacity-0 sm:group-hover:opacity-100 cursor-pointer z-20 border border-white/20 shadow-md active:scale-95"
           >
             <ChevronLeft className="w-5 h-5" />
           </button>
           <button
             onClick={handleNext}
             aria-label="Next Photo"
-            className="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-black/70 hover:bg-amber-500 hover:text-black text-white flex items-center justify-center transition-all opacity-90 sm:opacity-0 sm:group-hover:opacity-100 cursor-pointer z-20 backdrop-blur-md border border-white/20 shadow-lg active:scale-95"
+            className="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-black/70 hover:bg-amber-500 hover:text-black text-white flex items-center justify-center transition-all opacity-90 sm:opacity-0 sm:group-hover:opacity-100 cursor-pointer z-20 border border-white/20 shadow-md active:scale-95"
           >
             <ChevronRight className="w-5 h-5" />
           </button>
@@ -185,7 +187,7 @@ export default function PublicGalleryPage() {
                 onClick={() => setSelectedCategory(cat.id)}
                 className={`px-4 py-2 rounded-xl text-xs font-medium transition-all border cursor-pointer ${
                   isActive
-                    ? 'bg-amber-500/15 border-amber-500/50 text-amber-400 shadow-md shadow-amber-500/10'
+                    ? 'bg-amber-500/15 border-amber-500/50 text-amber-400 shadow-md'
                     : 'theme-bg-card theme-border theme-text-secondary hover:theme-text-primary'
                 }`}
               >

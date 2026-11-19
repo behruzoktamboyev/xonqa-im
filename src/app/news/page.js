@@ -149,6 +149,8 @@ export default function EditorialNewsPage() {
               <img 
                 src={featured.imageUrl}
                 alt={featured.title}
+                decoding="async"
+                loading="lazy"
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
               />
             </a>
@@ -167,6 +169,8 @@ export default function EditorialNewsPage() {
                 <img
                   src={secondary[0].imageUrl}
                   alt={secondary[0].title}
+                  decoding="async"
+                  loading="lazy"
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 />
               </a>
@@ -237,6 +241,8 @@ export default function EditorialNewsPage() {
                     <img
                       src={story.imageUrl}
                       alt={story.title}
+                      decoding="async"
+                      loading="lazy"
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
                   </a>
@@ -260,6 +266,8 @@ export default function EditorialNewsPage() {
               <img
                 src={sidebar[0].imageUrl}
                 alt={sidebar[0].title}
+                decoding="async"
+                loading="lazy"
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
               />
             </a>
@@ -326,6 +334,8 @@ export default function EditorialNewsPage() {
                   <img
                     src={col.imageUrl}
                     alt={col.title}
+                    decoding="async"
+                    loading="lazy"
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />
                 </a>

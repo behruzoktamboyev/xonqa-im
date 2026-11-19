@@ -67,26 +67,26 @@ function SocialBadge({ platform }) {
   switch (platform) {
     case 'instagram':
       return (
-        <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-amber-500 via-rose-500 to-purple-600 flex items-center justify-center text-white shadow-lg border-2 border-[var(--bg-page)]">
+        <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-amber-500 via-rose-500 to-purple-600 flex items-center justify-center text-white shadow-md border-2 border-[var(--bg-page)]">
           <InstagramIcon className="w-5 h-5" />
         </div>
       );
     case 'telegram':
       return (
-        <div className="w-10 h-10 rounded-full bg-sky-500 flex items-center justify-center text-white shadow-lg border-2 border-[var(--bg-page)]">
+        <div className="w-10 h-10 rounded-full bg-sky-500 flex items-center justify-center text-white shadow-md border-2 border-[var(--bg-page)]">
           <TelegramIcon className="w-4 h-4 -translate-x-0.5 translate-y-0.5" />
         </div>
       );
     case 'youtube':
       return (
-        <div className="w-10 h-10 rounded-full bg-red-600 flex items-center justify-center text-white shadow-lg border-2 border-[var(--bg-page)]">
+        <div className="w-10 h-10 rounded-full bg-red-600 flex items-center justify-center text-white shadow-md border-2 border-[var(--bg-page)]">
           <YoutubeIcon className="w-5 h-5" />
         </div>
       );
     case 'facebook':
     default:
       return (
-        <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-white shadow-lg border-2 border-[var(--bg-page)]">
+        <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-white shadow-md border-2 border-[var(--bg-page)]">
           <FacebookIcon className="w-5 h-5" />
         </div>
       );
@@ -115,19 +115,19 @@ export default function Home() {
         
         {/* Integrated Right-Side Floating Gallery */}
         <div className="absolute right-0 top-0 bottom-0 w-full md:w-3/5 lg:w-1/2 pointer-events-none z-0 overflow-hidden flex items-center justify-end">
-          <div className="relative w-[130%] h-[130%] md:w-[150%] flex items-center justify-center -rotate-6 scale-110 opacity-40 md:opacity-70 transition-transform duration-1000">
-             <div className="grid grid-cols-3 gap-4 md:gap-6">
-                <div className="flex flex-col gap-4 md:gap-6 -mt-24">
-                   <img src="lesson_5.webp" className="rounded-3xl object-cover w-32 h-48 md:w-48 md:h-64 shadow-2xl border-4 border-white/5" alt="Demo 1" />
-                   <img src="lesson_6.webp" className="rounded-3xl object-cover w-32 h-56 md:w-48 md:h-80 shadow-2xl border-4 border-white/5" alt="Demo 2" />
+          <div className="relative w-[130%] h-[130%] md:w-[150%] flex items-center justify-center -rotate-6 scale-105 opacity-30 md:opacity-60 transition-transform duration-700 will-change-transform">
+             <div className="grid grid-cols-3 gap-3 md:gap-6">
+                <div className="flex flex-col gap-3 md:gap-6 -mt-24">
+                   <img src="lesson_5.webp" decoding="async" loading="lazy" className="rounded-3xl object-cover w-32 h-48 md:w-48 md:h-64 shadow-lg border border-white/5" alt="Demo 1" />
+                   <img src="lesson_6.webp" decoding="async" loading="lazy" className="rounded-3xl object-cover w-32 h-56 md:w-48 md:h-80 shadow-lg border border-white/5" alt="Demo 2" />
                 </div>
-                <div className="flex flex-col gap-4 md:gap-6 mt-12">
-                   <img src="lesson_4.webp" className="rounded-3xl object-cover w-32 h-56 md:w-48 md:h-80 shadow-2xl border-4 border-white/5" alt="Demo 3" />
-                   <img src="lesson_3.webp" className="rounded-3xl object-cover w-32 h-48 md:w-48 md:h-64 shadow-2xl border-4 border-white/5" alt="Demo 4" />
+                <div className="flex flex-col gap-3 md:gap-6 mt-12">
+                   <img src="lesson_4.webp" decoding="async" loading="lazy" className="rounded-3xl object-cover w-32 h-56 md:w-48 md:h-80 shadow-lg border border-white/5" alt="Demo 3" />
+                   <img src="lesson_3.webp" decoding="async" loading="lazy" className="rounded-3xl object-cover w-32 h-48 md:w-48 md:h-64 shadow-lg border border-white/5" alt="Demo 4" />
                 </div>
-                <div className="flex flex-col gap-4 md:gap-6 -mt-16">
-                   <img src="lesson_2.webp" className="rounded-3xl object-cover w-32 h-48 md:w-48 md:h-64 shadow-2xl border-4 border-white/5" alt="Demo 5" />
-                   <img src="lesson_1.webp" className="rounded-3xl object-cover w-32 h-56 md:w-48 md:h-80 shadow-2xl border-4 border-white/5" alt="Demo 6" />
+                <div className="flex flex-col gap-3 md:gap-6 -mt-16">
+                   <img src="lesson_2.webp" decoding="async" loading="lazy" className="rounded-3xl object-cover w-32 h-48 md:w-48 md:h-64 shadow-lg border border-white/5" alt="Demo 5" />
+                   <img src="lesson_1.webp" decoding="async" loading="lazy" className="rounded-3xl object-cover w-32 h-56 md:w-48 md:h-80 shadow-lg border border-white/5" alt="Demo 6" />
                 </div>
              </div>
           </div>
@@ -140,7 +140,7 @@ export default function Home() {
         {/* Hero Content Layer */}
         <div className="relative z-10 px-6 pt-12 pb-6 max-w-7xl mx-auto w-full my-auto">
           <div className="max-w-2xl space-y-6">
-            <div className="inline-flex items-center gap-2 px-3.5 py-2 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-500 text-[10px] sm:text-xs font-mono font-bold tracking-wider uppercase backdrop-blur-md">
+            <div className="inline-flex items-center gap-2 px-3.5 py-2 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-500 text-[10px] sm:text-xs font-mono font-bold tracking-wider uppercase backdrop-blur-none sm:backdrop-blur-md">
               <GraduationCap className="w-4 h-4 shrink-0 text-amber-500" />
               <span className="leading-tight">
                 {t('hero', 'agencyBadge')}
@@ -158,7 +158,7 @@ export default function Home() {
             <div className="flex flex-wrap items-center gap-4">
               <a
                 href="#clubs"
-                className="inline-flex items-center gap-2 bg-emerald-500 hover:bg-emerald-400 text-black px-6 py-3.5 rounded-full text-xs font-bold transition-all shadow-lg"
+                className="inline-flex items-center gap-2 bg-emerald-500 hover:bg-emerald-400 text-black px-6 py-3.5 rounded-full text-xs font-bold transition-all shadow-md"
               >
                 {t('hero', 'exploreClubs')} <ArrowRight className="w-4 h-4" />
               </a>
@@ -175,7 +175,7 @@ export default function Home() {
           <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-16 md:w-32 bg-gradient-to-l from-[var(--bg-page)] to-transparent z-20" />
 
           <div className="overflow-hidden w-full">
-            <div className="animate-marquee transform-gpu gap-6 pl-6">
+            <div className="animate-marquee transform-gpu will-change-transform gap-6 pl-6">
               {marqueeItems.map((item, index) => (
                 <a
                   key={`${item.id}-${index}`}
@@ -184,15 +184,17 @@ export default function Home() {
                   rel="noopener noreferrer"
                   className="group relative flex flex-col items-center shrink-0 w-[280px] md:w-[320px] cursor-pointer"
                 >
-                  <div className="z-10 mb-3 transition-transform duration-300 group-hover:scale-110">
+                  <div className="z-10 mb-3 transition-transform duration-300 group-hover:scale-105">
                     <SocialBadge platform={item.platform} />
                   </div>
 
-                  <div className="w-full h-[300px] md:h-[340px] rounded-3xl overflow-hidden relative bg-zinc-900 border-none outline-none ring-0 shadow-2xl isolate transform-gpu transition-transform duration-300 group-hover:-translate-y-1">
+                  <div className="w-full h-[300px] md:h-[340px] rounded-3xl overflow-hidden relative bg-zinc-900 border-none outline-none ring-0 shadow-lg isolate transform-gpu transition-transform duration-300 group-hover:-translate-y-1">
                     <img
                       src={item.imageUrl}
                       alt={item.title}
-                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                      decoding="async"
+                      loading="lazy"
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                     />
 
                     {(item.platform === 'youtube' || item.platform === 'instagram') && (
